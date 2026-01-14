@@ -1,0 +1,44 @@
+# code: language=yaml
+#
+# Helm release for Redis
+#
+# Redis provides:
+# - In-memory data structure store
+# - Caching, session management, message broker
+# - Pub/sub messaging patterns
+# - High availability with Sentinel or Cluster modes
+#
+
+{{- $redis := $state.redis }}
+
+---
+apiVersion: helm.m.crossplane.io/v1beta1
+kind: Release
+metadata:
+  name: {{ $redis.releaseName }}
+  annotations:
+    {{ setResourceNameAnnotation "helm-release-redis" }}
+  labels: {{ $redis.labels | toJson }}
+spec:
+  managementPolicies: {{ $redis.managementPolicies | toJson }}
+  forProvider:
+    chart:
+      name: redis
+      repository: https://charts.bitnami.com/bitnami
+      version: "24.1.0"
+    namespace: {{ $redis.namespace }}
+    {{- if $redis.overrideAllValues }}
+    values:
+      {{- toYaml $redis.overrideAllValues | nindent 6 }}
+    {{- else }}
+    values:
+      fullnameOverride: redis
+      nameOverride: redis
+      {{- if $redis.values }}
+      {{- toYaml $redis.values | nindent 6 }}
+      {{- end }}
+    {{- end }}
+  rollbackLimit: 3
+  providerConfigRef:
+    name: {{ $redis.providerConfigRef.name }}
+    kind: {{ $redis.providerConfigRef.kind }}

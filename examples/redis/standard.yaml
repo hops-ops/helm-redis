@@ -1,0 +1,28 @@
+apiVersion: helm.hops.ops.com.ai/v1alpha1
+kind: Redis
+metadata:
+  name: redis
+  namespace: example-env
+spec:
+  clusterName: example-cluster
+
+  labels:
+    team: platform
+
+  helm:
+    namespace: redis
+    name: redis
+    values:
+      architecture: replication
+      auth:
+        enabled: true
+      replica:
+        replicaCount: 3
+      master:
+        persistence:
+          enabled: true
+          size: 8Gi
+      metrics:
+        enabled: true
+        serviceMonitor:
+          enabled: true
