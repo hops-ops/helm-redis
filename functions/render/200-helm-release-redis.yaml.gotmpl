@@ -30,13 +30,9 @@ spec:
     {{- if $redis.overrideAllValues }}
     values:
       {{- toYaml $redis.overrideAllValues | nindent 6 }}
-    {{- else }}
+    {{- else if $redis.values }}
     values:
-      fullnameOverride: redis
-      nameOverride: redis
-      {{- if $redis.values }}
       {{- toYaml $redis.values | nindent 6 }}
-      {{- end }}
     {{- end }}
   rollbackLimit: 3
   providerConfigRef:
